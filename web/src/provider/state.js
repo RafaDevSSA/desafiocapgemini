@@ -8,15 +8,18 @@ const store = new Vuex.Store({
         account: {}
     },
     mutations: {
-        set(state, { account }) {
-            state.account = account
-            alert(account)
+        setAccount(state, payload) {
+            state.account = payload
         },
     },
     actions: {
-        set(state, { account }) {
-            state.account = account
-            alert(account)
+      setAccount(state,payload){
+          state.commit('setAccount',payload)
+      }
+    },
+    getters: {
+        account(state) {
+            return state.account
         }
     }
 });

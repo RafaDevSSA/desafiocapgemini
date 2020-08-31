@@ -23,7 +23,7 @@ class Account extends Model
             $obj->balance = 0;
         }
          //edição apenas da senha
-        $obj->password = $request->password;
+        $obj->password = ''.bcrypt($request->password);
         return $obj;
     }
 

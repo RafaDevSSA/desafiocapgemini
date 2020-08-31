@@ -24,5 +24,6 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
     Route::post('/account',['as'=>'save-account','uses'=>'AccountController@save']);
     Route::post('/account/login',['as'=>'get-account','uses'=>'AccountController@login']);
+    Route::post('/account/balance',['as'=>'balance-account','uses'=>'AccountController@balance']);
     Route::post('/account/deposit',['as'=>'deposit-account','uses'=>'AccountController@deposit']);
     Route::post('/account/withdraw',['as'=>'withdraw-account','uses'=>'AccountController@withdraw']);

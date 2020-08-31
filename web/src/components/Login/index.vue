@@ -8,16 +8,16 @@
       <img class="hero-image" src="../../assets/img/banner.png" />
       <form id="login">
         <div class="input-block">
-          <label for="number">Conta</label>
-          <input type="text" id="number" v-model="number" />
+          <label for="agency">Agencia</label>
+          <input type="text" id="agency" v-model="agency" name="agency" />
         </div>
         <div class="input-block">
-          <label for="agency">Agencia</label>
-          <input type="text" id="agency" v-model="agency" />
+          <label for="number">Conta</label>
+          <input type="text" id="number" v-model="number" name="number" />
         </div>
         <div class="input-block">
           <label for="password">Senha</label>
-          <input type="text" id="password" v-model="password" />
+          <input type="text" id="password" v-model="password" name="password" />
         </div>
         <div class="input-block">
           <button v-on:click="login()" type="button">entrar na conta</button>
@@ -37,21 +37,20 @@ export default {
   },
   methods: {
     login: function () {
-      let credentials = new FormData();
-      credentials.append("number", this.number);
-      credentials.append("agency", this.agency);
-      credentials.append("password", this.password);
+      let request = new FormData();
+      request.append("number", this.number);
+      request.append("agency", this.agency);
+      request.append("password", this.password);
 
       fetch("http://localhost/cap/api/public/api/account/login", {
         method: "post",
-        body: credentials,
+        body: request,
       })
-        .then((resp) => resp.json())
         .then((data) => {
-         const credentials = data.credentials
-         console.log(credentials);
-          this.$store.commit("set", { credentials });
-          console.log(this.$store.state.account);
+          let credentials = data.json().credentials;
+          credentials.password = this.password;
+          this.$store.commit("setAccount", credentials);
+          this.$router.push("/dash");
         })
         .catch((err) => {
           console.log(err);
