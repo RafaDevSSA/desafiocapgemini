@@ -3,7 +3,7 @@
     <div id="page-content">
       <div class="logo-container">
         <img alt="Logo Capgemini" src="../../assets/img/brand.png" />
-        <h2>Internet Bancking Capgemini</h2>
+        <h2>Internet Banking Capgemini</h2>
       </div>
       <img class="brand-image" src="../../assets/img/banner.png" />
       <form id="login">
