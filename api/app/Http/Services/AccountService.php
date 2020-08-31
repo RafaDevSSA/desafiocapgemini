@@ -9,7 +9,8 @@ use App\Account;
 class AccountService
 {
 
-    public static function save($request)
+    private $errors = [];
+    public function save($request)
     {
       $account = Account::populate($request);
       DB::beginTransaction();
@@ -24,7 +25,7 @@ class AccountService
       }
     }
 
-    public  static function login($request){
+    public function login($request){
         $account = Account::select('holder','number','agency','balance','password')
         ->where('number',$request->number)
         ->where('agency',$request->agency)
@@ -38,7 +39,7 @@ class AccountService
     }
 
     //metodo balance similar ou metodo de login, que retorna apenas o saldo da conta 
-    public static function balance($request){
+    public  function balance($request){
         $account = Account::select('balance','password')
         ->where('number',$request->number)
         ->where('agency',$request->agency)
@@ -51,7 +52,7 @@ class AccountService
         }
     }
 
-    public static function deposit($request){
+    public function deposit($request){
       $account = Account::find($request->number);
       if(!$account){
         return response()->json('Conta não encontrada.',403);
@@ -69,23 +70,17 @@ class AccountService
         DB::rollback();
         $err = $exc->getMessage();
         $msgUser = "Falha ao realizar transação.";
-        return response()->json([err=>$err,msg=>msgUser],500);
+        return response()->json(["err"=>$err,"msg"=>msgUser],500);
       }
     }
 
-    public static function withdraw($request){
+    public function withdraw($request){
+
       $account = Account::find($request->number);
-      if($account->agency != $request->agency){
-        return response()->json('Agencia não encontrada.',403);
-      }
-      if(!$account){
-        return response()->json('Conta não encontrada.',403);
-      }
-      if(!Hash::check($request->password, $account->password)){
-        return response()->json('Senha incorreta.',403);
-      }
-      if($account->balance < $request->withdraw){
-        return response()->json('Saldo insuficiente.',403);
+      $this->validate($account,$request);
+
+      if(sizeof($this->errors) > 0){
+        return response()->json(["allErrors"=>$this->errors,"msg"=>$this->errors[0]],403);
       }
 
       $account->balance -=  $request->withdraw;
@@ -93,12 +88,28 @@ class AccountService
       try {
         $account->save();
         DB::commit();
-        return response()->json("Saque Realizado");
+        return response()->json(["msg"=>"Saque Realizado"]);
       } catch (\PDOException $exc) {
         DB::rollback();
         $err = $exc->getMessage();
         $msgUser = "Falha ao realizar transação.";
         return response()->json([err=>$err,msg=>msgUser],500);
+      }
+    }
+
+    protected function validate($account,$request){
+      if($account == null){
+        $this->errors[] = 'Conta não encontrada.'; 
+      }else{
+        if($account->agency != $request->agency){
+         $this->errors[] = 'Agencia não encontrada.'; 
+        }
+        if(!Hash::check($request->password, $account->password)){
+          $this->errors[] = 'Senha incorreta.'; 
+        }
+        if($account->balance < $request->withdraw){
+          $this->errors[] = 'Saldo insuficiente.'; 
+        }
       }
     }
 }

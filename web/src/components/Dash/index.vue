@@ -1,8 +1,8 @@
 <template>
-  <div id="page-landing">
+  <div id="page">
     {{setAccount()}}
     <div id="page-account-content">
-      <article class="teacher-item">
+      <article class="account-item">
         <header>
           <img class="hero-image" src="../../assets/img/brand.png" />
           <div class="account-data">
@@ -13,7 +13,7 @@
             </span>
           </div>
         </header>
-        <footer class="teacher-footer">
+        <footer class="account-footer">
           <p>
             Saldo:
             <strong>R$ {{account.balance}}</strong>
@@ -27,8 +27,8 @@
             name="operationValue"
             placeholder="Valor do deposito / saque"
           />
-          <button type="button" v-on:click="deposit()">depositar</button>
-          <button type="button" v-on:click="withdraw()">sacar</button>
+          <button type="button" v-on:click="deposit()" class="deposit">depositar</button>
+          <button type="button" v-on:click="withdraw()" class="withdraw">sacar</button>
         </div>
       </article>
     </div>
@@ -39,17 +39,16 @@ export default {
   name: "DashBoard",
   data() {
     return {
-      operationValue: '',
+      operationValue: "",
       account: {},
     };
   },
   methods: {
     setAccount() {
-      console.log(this.$store.getters.account);
-    if(!this.$store.getters.account.agency){
-      this.logout();
-      return;
-    }
+      if (!this.$store.getters.account.agency) {
+        this.logout();
+        return;
+      }
       this.account = this.$store.getters.account;
     },
     deposit() {
@@ -85,7 +84,7 @@ export default {
       })
         .then((resp) => resp.json())
         .then((data) => {
-          this.$alert(data);
+          this.$alert(data.msg);
           this.balance();
         })
         .catch((err) => {

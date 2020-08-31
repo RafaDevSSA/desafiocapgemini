@@ -10,7 +10,12 @@ use App\Http\Requests\AccountRequest;
 class AccountController extends Controller
 {
 
+    protected $service;
 
+    public function __construct(){
+      $this->service = new AccountService();
+    }
+  
     /**
      *save a new acount.
      *
@@ -19,7 +24,7 @@ class AccountController extends Controller
      */
     public function save(AccountRequest $request)
     {
-     return AccountService::save($request);
+     return $this->service->save($request);
     }
 
     /**
@@ -29,7 +34,7 @@ class AccountController extends Controller
      * @return Json Object
      */
     public  function login(Request $request){
-      return AccountService::login($request);
+      return $this->service->login($request);
     }
 
      /**
@@ -40,7 +45,7 @@ class AccountController extends Controller
      */
     public function balance(Request $request){
       //metodo balance similar ou metodo de login, que retorna apenas o saldo da conta 
-      return AccountService::balance($request);
+      return  $this->service->balance($request);
     }
 
      /**
@@ -50,7 +55,7 @@ class AccountController extends Controller
      * @return Json Object
      */
     public function deposit(Request $request){
-      return AccountService::deposit($request);
+      return  $this->service->deposit($request);
     }
 
      /**
@@ -60,6 +65,6 @@ class AccountController extends Controller
      * @return Json Object
      */
     public function withdraw(Request $request){
-      return AccountService::withdraw($request);
+      return  $this->service->withdraw($request);
     }
 }

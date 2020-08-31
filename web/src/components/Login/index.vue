@@ -1,11 +1,11 @@
 <template>
-  <div id="page-landing">
-    <div id="page-landing-content">
+  <div id="page">
+    <div id="page-content">
       <div class="logo-container">
         <img alt="Logo Capgemini" src="../../assets/img/brand.png" />
         <h2>Internet Bancking Capgemini</h2>
       </div>
-      <img class="hero-image" src="../../assets/img/banner.png" />
+      <img class="brand-image" src="../../assets/img/banner.png" />
       <form id="login">
         <div class="input-block">
           <label for="agency">Agencia</label>
@@ -20,7 +20,7 @@
           <input type="text" id="password" v-model="password" name="password" />
         </div>
         <div class="input-block">
-          <button v-on:click="login()" type="button">entrar na conta</button>
+          <button v-on:click="login()" type="button">{{loading ? 'Carregando' : 'entrar na conta'}}</button>
         </div>
       </form>
     </div>
@@ -30,13 +30,17 @@
 //import { API } from "../provider/api";
 export default {
   name: "Login",
-  props: {
-    number: String,
-    agency: String,
-    password: String,
+  data() {
+    return {
+      loading: false,
+      number: "",
+      agency: "",
+      password: "",
+    };
   },
   methods: {
     login: function () {
+      this.loading = !this.loading;
       let request = new FormData();
       request.append("number", this.number);
       request.append("agency", this.agency);
@@ -46,14 +50,22 @@ export default {
         method: "post",
         body: request,
       })
-        .then((data) => {
-          let credentials = data.json().credentials;
+        .then(async (data) => {
+          this.loading = !this.loading;
+          if (data.status == "403") {
+            this.$alert("Conta não encontrada.");
+            return false;
+          }
+          let response = await data.json();
+          let credentials = response.credentials;
           credentials.password = this.password;
           this.$store.commit("setAccount", credentials);
           this.$router.push("/dash");
         })
         .catch((err) => {
+          this.loading = !this.loading;
           console.log(err);
+          this.$danger("Falha ao buscar informações.");
         });
     },
   },
